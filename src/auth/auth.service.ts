@@ -19,12 +19,13 @@ export class AuthService {
     async signupUser(signUpDto: SignUpDto): Promise<{token: string}> {
         const {name, email, password} = signUpDto
 
-        const hashedPassword = await bcrypt.hash(password, 10)
+        const salt = await bcrypt.genSalt(10)
+
+        const hashedPassword = await bcrypt.hash(password, salt)
 
         if(!hashedPassword) {
             throw new NotAcceptableException("Email or pasword does not match")
         }
-
 
         const user = await this.userModel.create({
             email,
@@ -43,13 +44,13 @@ export class AuthService {
 
         const user = await this.userModel.findOne({email})
         if(!user) {
-            throw new UnauthorizedException("Invalid email or password")
+            throw new UnauthorizedException("Incorrect email or password")
         } 
 
         const isPasswordMatched = await bcrypt.compare(password, user.password)
 
         if(!isPasswordMatched) {
-            throw new UnauthorizedException("Invalid email or password")
+            throw new UnauthorizedException("Incorrect email or password")
         }
 
         const token = this.jwtService.sign({id: user._id})
