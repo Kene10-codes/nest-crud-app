@@ -16,7 +16,7 @@ export class AuthService {
       private jwtService: JwtService
     ){}
 
-    async signupUser(signUpDto: SignUpDto): Promise<{token: string}> {
+    async signupUser(signUpDto: SignUpDto): Promise<{token: any}> {
         const {name, email, password} = signUpDto
 
         const salt = await bcrypt.genSalt(10)
@@ -24,7 +24,7 @@ export class AuthService {
         const hashedPassword = await bcrypt.hash(password, salt)
 
         if(!hashedPassword) {
-            throw new NotAcceptableException("Email or pasword does not match")
+            throw new NotAcceptableException("Password was not hashed")
         }
 
         const user = await this.userModel.create({
@@ -33,13 +33,11 @@ export class AuthService {
             password: hashedPassword
         })
 
-       const token = this.jwtService.sign({id: user._id})
-   
-        return {token}
+        return {token:  this.jwtService.signAsync({id: user._id})}
 
     }
 
-    async loginUser(loginDto: LoginUpDto): Promise<{token: string}> {
+    async loginUser(loginDto: LoginUpDto): Promise<{token: any}> {
          const {email, password} = loginDto
 
         const user = await this.userModel.findOne({email})
@@ -53,8 +51,7 @@ export class AuthService {
             throw new UnauthorizedException("Incorrect email or password")
         }
 
-        const token = this.jwtService.sign({id: user._id})
-
-        return  {token}
+     
+        return  {token: this.jwtService.signAsync({id: user._id})}
     }
 }

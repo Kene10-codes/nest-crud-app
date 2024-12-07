@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards, Param, Put, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, Param, Put, HttpCode, HttpStatus, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/signup.dto';
 import { LoginUpDto } from './dto/login.dto';
@@ -12,12 +12,13 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 export class AuthController {
     constructor(private authService: AuthService){}
 
+    @HttpCode(HttpStatus.OK)
     @Roles(Role.USER, Role.ADMIN)
     @UseGuards(AuthGuard(), RolesGuard)
     @Post('signup')
     signUpUser(@Body() signupDto: SignUpDto): Promise<{token: string}> {
      return this.authService.signupUser(signupDto)
-    }
+    } 
 
     @Get('login')
     loginUser(@Body() loginDto: LoginUpDto): Promise<{token: string}>{
