@@ -40,3 +40,4 @@ import {
       return type === 'Bearer' ? token : undefined;
     }
   }
+  
