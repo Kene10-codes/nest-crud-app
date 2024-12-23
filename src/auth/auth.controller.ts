@@ -20,22 +20,20 @@ export class AuthController {
     // @UseGuards(AuthGuard(), RolesGuard)
     @Post('signup')
     signUpUser(@Body() signupDto: SignUpDto): Promise<{token: string}> {
-     return this.authService.signupUser(signupDto)
+     return this.authService.signupUser(signupDto);
     } 
 
     @Post('login')
     @UseGuards(LocalGuard)
-    loginUser(@Body() loginDto: LoginUpDto): Promise<{token: string}>{
-        const user = this.authService.loginUser(loginDto)
-        if(!user) throw new HttpException("No user found!", 403)
-        return user;
+    loginUser(@Req() request: Request){
+        return request.user;
     }
 
   
     @Get('profile')
     @UseGuards(JWTGuard)
     getProfile(@Req() request: Request){
-        console.log(request.user)
+        return request.user;
     }
 }
 
