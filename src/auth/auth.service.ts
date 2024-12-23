@@ -32,24 +32,18 @@ export class AuthService {
             name,
             password: hashedPassword
         })
-
         return {token:  this.jwtService.sign({id: user._id})}
 
     }
 
     async loginUser(loginDto: LoginUpDto): Promise<{token: any}> {
          const {email, password} = loginDto
-
         const user = await this.userModel.findOne({email})
-        console.log(user)
-        if(!user) {
-            throw new UnauthorizedException("Incorrect email or password")
+        if(user) {
+            const isPasswordMatched = await bcrypt.compare(password, user.password)
+            if (!isPasswordMatched) throw new UnauthorizedException("Invalid credentials")
         } 
-        const isPasswordMatched = await bcrypt.compare(password, user.password)
-        if(!isPasswordMatched) {
-            throw new UnauthorizedException("Incorrect email or password")
-        }
-     
+      
         return  {token: this.jwtService.sign({id: user._id})}
     }
 }

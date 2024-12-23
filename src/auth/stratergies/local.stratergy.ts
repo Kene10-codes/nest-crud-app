@@ -9,12 +9,15 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
    constructor(
       @Inject("AUTH_SERVICE")
       private readonly authService: AuthService) {
-    super()
+    super({
+      usernameField: 'email'
+    })
    }
 
    validate(email: string, password: string) {
       const loginInfo = {email, password}
-     return this.authService.loginUser(loginInfo)
-        
+      const user = this.authService.loginUser(loginInfo)
+      if(!user) throw new UnauthorizedException()
+      return user;        
    } 
 }
